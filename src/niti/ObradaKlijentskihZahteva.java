@@ -9,10 +9,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import model.Admin;
 import model.Poruka;
 import model.User;
 import operacije.Operacije;
@@ -46,6 +45,13 @@ public class ObradaKlijentskihZahteva extends Thread {
                     for (User useri : Controller.getInstance().getUseri()) {
                         Controller.getInstance().posaljiSvima((Poruka) kz.getParam(), useri);
                     }
+                    break;
+                case Operacije.VRATI_USERE:
+                    List<User> useri = (List<User>) Controller.getInstance().getUseri();
+                    so.setOdgovor(useri);
+                    break;
+                case Operacije.POSALJI:
+                    Controller.getInstance().posalji((Poruka) kz.getParam());
                     break;
 
                 default:

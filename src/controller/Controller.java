@@ -18,7 +18,7 @@ import model.User;
 public class Controller {
 
     private static Controller instance;
-    private DBBroker dbb;
+    private final DBBroker dbb;
     private Admin ulogovan;
     private List<User> useri = new ArrayList<>();
 
@@ -64,7 +64,7 @@ public class Controller {
 
     public User loginUser(User user) {
         User u = dbb.loginUser(user);
-        if (u != null) {
+        if (u != null && !useri.contains(u)) {
             useri.add(u);
         }
         return u;
@@ -72,6 +72,10 @@ public class Controller {
 
     public void posaljiSvima(Poruka poruka, User u) {
         dbb.posaljiSvima(poruka, u);
+    }
+
+    public void posalji(Poruka poruka) {
+        dbb.posalji(poruka);
     }
 
 }

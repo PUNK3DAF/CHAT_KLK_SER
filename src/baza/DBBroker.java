@@ -124,4 +124,22 @@ public class DBBroker {
         }
     }
 
+    public void posalji(Poruka poruka) {
+        try {
+            String upit = "INSERT INTO poruke(posiljalacId,primalacId,tekst,vreme) VALUES (?,?,?,?)";
+            PreparedStatement ps = Konekcija.getInstance().getKonek().prepareStatement(upit);
+            ps.setInt(1, poruka.getPosiljalac().getId());
+            ps.setInt(2, poruka.getPrimalac().getId());
+            ps.setString(3, poruka.getText());
+            Timestamp t = new Timestamp(poruka.getVreme().getTime());
+            ps.setTimestamp(4, t);
+            int red = ps.executeUpdate();
+            if (red > 0) {
+                System.out.println("USPESNO POSLATA PORUKA");
+            }
+            Konekcija.getInstance().getKonek().commit();
+        } catch (SQLException ex) {
+            Logger.getLogger(DBBroker.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }
