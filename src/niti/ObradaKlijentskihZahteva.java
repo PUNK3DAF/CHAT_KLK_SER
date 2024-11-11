@@ -11,7 +11,10 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import model.Admin;
+import model.Poruka;
+import model.User;
 import operacije.Operacije;
 import transfer.KlijentskiZahtev;
 import transfer.ServerskiOdgovor;
@@ -36,9 +39,15 @@ public class ObradaKlijentskihZahteva extends Thread {
 
             switch (kz.getOperacija()) {
                 case Operacije.LOGIN:
-                    Admin a = Controller.getInstance().loginAdmin((Admin) kz.getParam());
-                    so.setOdgovor(a);
+                    User u = Controller.getInstance().loginUser((User) kz.getParam());
+                    so.setOdgovor(u);
                     break;
+                case Operacije.POSALJI_SVIMA:
+                    for (User useri : Controller.getInstance().getUseri()) {
+                        Controller.getInstance().posaljiSvima((Poruka) kz.getParam(), useri);
+                    }
+                    break;
+
                 default:
                     throw new AssertionError();
             }

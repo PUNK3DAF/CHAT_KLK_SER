@@ -8,9 +8,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Admin;
+import model.Poruka;
 import model.User;
 
 /**
@@ -34,8 +36,8 @@ public class DBBroker {
             if (rs.next()) {
                 a = new Admin();
                 a.setAdminId(rs.getInt("adminId"));
-                a.setEmail(rs.getString("email"));
-                a.setPass(rs.getString("pass"));
+                a.setEmail(admin.getEmail());
+                a.setPass(admin.getPass());
                 a.setIme(rs.getString("ime"));
                 a.setPrezime(rs.getString("prezime"));
             }
@@ -71,10 +73,52 @@ public class DBBroker {
             ps.setString(2, u.getSifra());
             int red = ps.executeUpdate();
             if (red > 0) {
+                Konekcija.getInstance().getKonek().commit();
                 System.out.println("uspesno dodat korisnik");
             } else {
                 System.out.println("neuspesno dodavanje");
             }
+        } catch (SQLException ex) {
+            Logger.getLogger(DBBroker.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public User loginUser(User user) {
+        User u = null;
+
+        try {
+            String upit = "SELECT * FROM useri WHERE user=? AND sifra=?";
+            PreparedStatement ps = Konekcija.getInstance().getKonek().prepareStatement(upit);
+            ps.setString(1, user.getUser());
+            ps.setString(2, user.getSifra());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                u = new User();
+                u.setId(rs.getInt("userId"));
+                u.setUser(rs.getString("user"));
+                u.setSifra(rs.getString("sifra"));
+            }
+            return u;
+        } catch (SQLException ex) {
+            Logger.getLogger(DBBroker.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return u;
+    }
+
+    public void posaljiSvima(Poruka poruka, User u) {
+        try {
+            String upit = "INSERT INTO poruke(posiljalacId,primalacId,tekst,vreme) VALUES (?,?,?,?)";
+            PreparedStatement ps = Konekcija.getInstance().getKonek().prepareStatement(upit);
+            ps.setInt(1, poruka.getPosiljalac().getId());
+            ps.setInt(2, u.getId());
+            ps.setString(3, poruka.getText());
+            Timestamp t = new Timestamp(poruka.getVreme().getTime());
+            ps.setTimestamp(4, t);
+            int red = ps.executeUpdate();
+            if (red > 0) {
+                System.out.println("USPESNO POSLATA PORUKA");
+            }
+            Konekcija.getInstance().getKonek().commit();
         } catch (SQLException ex) {
             Logger.getLogger(DBBroker.class.getName()).log(Level.SEVERE, null, ex);
         }

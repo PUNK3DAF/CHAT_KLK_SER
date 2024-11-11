@@ -8,6 +8,7 @@ import baza.DBBroker;
 import java.util.ArrayList;
 import java.util.List;
 import model.Admin;
+import model.Poruka;
 import model.User;
 
 /**
@@ -19,6 +20,7 @@ public class Controller {
     private static Controller instance;
     private DBBroker dbb;
     private Admin ulogovan;
+    private List<User> useri = new ArrayList<>();
 
     public Controller() {
         dbb = new DBBroker();
@@ -36,6 +38,14 @@ public class Controller {
         return ulogovan;
     }
 
+    public List<User> getUseri() {
+        return useri;
+    }
+
+    public void setUseri(List<User> useri) {
+        this.useri = useri;
+    }
+
     public Admin getUlogovan() {
         return ulogovan;
     }
@@ -50,6 +60,18 @@ public class Controller {
 
     public void dodaj(User u) {
         dbb.dodaj(u);
+    }
+
+    public User loginUser(User user) {
+        User u = dbb.loginUser(user);
+        if (u != null) {
+            useri.add(u);
+        }
+        return u;
+    }
+
+    public void posaljiSvima(Poruka poruka, User u) {
+        dbb.posaljiSvima(poruka, u);
     }
 
 }
